@@ -1,5 +1,7 @@
 ## FinApi - Financeira
 
+API de teste do início do curso de node do Ignite
+
 ---
 
 ### Requisitos 
