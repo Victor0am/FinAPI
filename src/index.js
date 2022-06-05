@@ -62,7 +62,7 @@ app.get('/', (request, response) => {
  * 
  * error -> já existe uma conta cadastrada com esse cpf (400)
  * 
- * 201 -> deu tudo certo
+ * 201 -> deu tudo certo e um novo usuário foi criado
  */
 
 app.post('/account', (request, response) => {
@@ -82,12 +82,11 @@ app.post('/account', (request, response) => {
 
 })
 
-//app.use(verifyIfAccountExists);
 
-// procura o estrato de uma conta existente -> o cpf é o parametro da rota e se não existir
+// procura o estrato de uma conta existente -> o cpf é o parametro do cabeçalho e se não existir
 //contas que não usam esse cpf, retorna um erro
 /**
- * cpf - string (parametro da rota)
+ * cpf - string (parametro do cabeçalho)
  * 
  * error -> se não existir conta com esse cpf (400)
  * 
@@ -97,6 +96,32 @@ app.post('/account', (request, response) => {
 app.get('/statement/', verifyIfAccountExists, (request,response) => {
     const customer = request.customer;
     return response.json(customer.statement);
+})
+
+// faz um depósito na conta -> o cpf é o parametro de cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ *  201 -> deu tudo certo e um novo statement será criado no array statement do usuário
+ */
+app.post('/deposit', verifyIfAccountExists, (request, response) => {
+    const {description, amount} = request.body;
+    const customer = request.customer;
+
+    const statementOperation = {
+        description,
+        amount,
+        createdAt: new Date(),
+        type: 'credit'
+    };
+
+    customer.statement.push(statementOperation);
+
+    return response.status(201).send();
 })
 
 
