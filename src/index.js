@@ -192,4 +192,40 @@ app.get('/statement/date', verifyIfAccountExists, (request, response) => {
     return response.json(statement);
 })
 
+// Atualiza os dados de uma conta -> o cpf é o parametro do cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+/**
+ * cpf - string (parametro do cabeçalho)
+ * name - string (parametro do body)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * 201 -> deu tudo certo e o usuário foi atualizado
+ */
+app.put('/account', verifyIfAccountExists, (request, response) => {
+    const {name} = request.body;
+    const customer = request.customer;
+
+    customer.name = name;
+
+    return response.status(201).send();
+
+})
+
+// Obtem os dados de uma conta -> o cpf é o parametro do cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * 201 -> deu tudo certo e retorna os dados da conta
+ */
+
+app.get('/account', verifyIfAccountExists, (request, response) => {
+    const customer = request.customer;
+    return response.json(customer);
+})
+
+
 app.listen(3333);
