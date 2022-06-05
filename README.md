@@ -1,2 +1,23 @@
-Nessa aula foram explicadas as coisas básicas de uma api usando o nodejs e expressjs (como usar os métodos HTTP, o insomnia e os tipos de parâmetros) então não deve ter muita coisa no código porque algumas das coisas foram exemplos conceituais que não achei válido copiar no código. Porém ele contem uma configuração básica de um projeto usando express nodejs junto de expressjs e nodemon. 
+## FinApi - Financeira
 
+---
+
+### Requisitos
+[] Deve ser possível criar umma conta
+[] Deve ser possível buscar o extrato bancário do cliente
+[] Deve ser possível realizar um depósito
+[] Deve ser possível realizar um saque
+[] Deve ser possível buscar o extrato bancário do cliente por data
+[] Deve ser possível atualizar dados da conta do cliente
+[] Deve ser possível obter dados da conta do cliente
+[] Deve ser possível deletar uma conta
+
+---
+
+### Regras de negócio
+[] Não deve ser possível cadastrar uma conta com CPF já existente
+[] Não deve ser possível fazer depósito em uma conta não existente
+[] Não deve ser possível buscar extrato em uma conta não existente
+[] Não deve ser possível fazer saque em uma conta não existente
+[] Não deve ser possível excluir uma conta não existente
+[] Não deve ser possível fazer saque quando o saldo for insuficiente
