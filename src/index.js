@@ -43,6 +43,10 @@ app.get('/', (request, response) => {
  * name - string (parametro do body)
  * id - uuid -> usando uuid (uuid)
  * statement []
+ * 
+ * error -> já existe uma conta cadastrada com esse cpf (400)
+ * 
+ * 201 -> deu tudo certo
  */
 
 app.post('/account', (request, response) => {
@@ -54,17 +58,35 @@ app.post('/account', (request, response) => {
         return response.status(400).json({error: 'Customer already exists.'});
     }
 
-
-
-
     customers.push({
         cpf, name, id: uuidv4(), statement: []
     });
-
 
     return response.status(201).send();
 
 })
 
+
+// procura o estrato de uma conta existente -> o cpf é o parametro da rota e se não existir
+//contas que não usam esse cpf, retorna um erro
+/**
+ * cpf - string (parametro da rota)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * retorno: json -> statement: []
+ */
+
+app.get('/statement/:cpf', (request,response) => {
+    const {cpf} = request.params;
+
+    const customer = customers.find(customer => customer.cpf === cpf);
+
+    if(!customer){
+        return response.status(400).json({error: 'Customer does not exists.'});
+    }
+
+    return response.json(customer.statement);
+})
 
 app.listen(3333);
