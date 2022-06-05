@@ -9,6 +9,22 @@ app.use(express.json());
 const customers = []; 
 
 
+//Middleware
+// função de verificação se uma conta já existe para usar como middleware
+function verifyIfAccountExists(request, response, next){
+    const { cpf } = request.headers;
+    const customer = customers.find(c => c.cpf === cpf);
+    
+    if(!customer){
+        return response.status(400).json({error: 'Customer not found'})
+    }
+
+    request.customer = customer;
+    
+    return next();
+}
+
+
 /**
  * GET - Buscar uma info no servidor
  * POST - Criar uma nova info no servidor
@@ -66,6 +82,7 @@ app.post('/account', (request, response) => {
 
 })
 
+//app.use(verifyIfAccountExists);
 
 // procura o estrato de uma conta existente -> o cpf é o parametro da rota e se não existir
 //contas que não usam esse cpf, retorna um erro
@@ -77,16 +94,10 @@ app.post('/account', (request, response) => {
  * retorno: json -> statement: []
  */
 
-app.get('/statement/:cpf', (request,response) => {
-    const {cpf} = request.params;
-
-    const customer = customers.find(customer => customer.cpf === cpf);
-
-    if(!customer){
-        return response.status(400).json({error: 'Customer does not exists.'});
-    }
-
+app.get('/statement/', verifyIfAccountExists, (request,response) => {
+    const customer = request.customer;
     return response.json(customer.statement);
 })
+
 
 app.listen(3333);
