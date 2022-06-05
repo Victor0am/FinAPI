@@ -29,12 +29,11 @@ function verifyIfAccountExists(request, response, next){
 function getBalance(statement){
     const balance = statement.reduce((acc, curr) => {
         if(curr.type === 'credit'){
-            return acc + curr.value;
+            return acc + curr.amount;
         }else{
-            return acc - curr.value;
+            return acc - curr.amount;
         }
     }, 0);
-
     return balance;
 }
 
@@ -221,11 +220,42 @@ app.put('/account', verifyIfAccountExists, (request, response) => {
  * 
  * 201 -> deu tudo certo e retorna os dados da conta
  */
-
 app.get('/account', verifyIfAccountExists, (request, response) => {
     const customer = request.customer;
     return response.json(customer);
 })
 
+// obtem o saldo de uma conta -> o cpf é o parametro do cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * retorna o saldo da conta
+ */
+app.get('/balance', verifyIfAccountExists, (request, response) => {
+    const customer = request.customer;
+    const balance = getBalance(customer.statement);
+    return response.json({balance});
+})
+
+// Deleta uma conta -> o cpf é o parametro do cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * 200 -> deu tudo certo e a conta foi deletada e retorna todas as contas existentes 
+*/
+app.delete('/account', verifyIfAccountExists, (request, response) => {
+    const customer = request.customer;
+    const index = customers.indexOf(customer);
+
+    customers.splice(index, 1);
+
+    return response.status(200).json(customers);
+})
 
 app.listen(3333);
