@@ -1,9 +1,13 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
 
 app.use(express.json());
+
+const customers = []; 
+
 
 /**
  * GET - Buscar uma info no servidor
@@ -30,5 +34,29 @@ app.use(express.json());
 app.get('/', (request, response) => {
     return response.json({message: "Hello World, this is my first API :D"});
 })
+
+
+// criar uma conta -> ela não pode ser criada com um cpf que já foi usado para criar uma 
+// conta anteriormente
+/**
+ * cpf - string (parametro do body)
+ * name - string (parametro do body)
+ * id - uuid -> usando uuid (uuid)
+ * statement []
+ */
+
+app.post('/account', (request, response) => {
+    const {cpf, name} = request.body;
+
+    const id = uuidv4();
+
+    customers.push({
+        cpf, name, id, statement: []
+    });
+
+    return response.status(201);
+
+})
+
 
 app.listen(3333);
