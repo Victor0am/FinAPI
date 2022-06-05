@@ -172,4 +172,24 @@ app.post('/withdraw', verifyIfAccountExists, (request, response) => {
     return response.status(201).send();
 })
 
+// procura o estrato de uma conta existente em certo dia -> o cpf é o parametro do cabeçalho e se não existir
+//contas que não usam esse cpf, retorna um erro
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ * 
+ * retorno: json -> statement: []
+ */
+app.get('/statement/date', verifyIfAccountExists, (request, response) => {
+    const customer = request.customer;
+    const {date} = request.query;
+
+    const dateFormat = new Date(date + " 00:00:00");
+
+    const statement = customer.statement.filter(statement => statement.createdAt.toDateString() === new Date(dateFormat).toDateString());
+
+    return response.json(statement);
+})
+
 app.listen(3333);
