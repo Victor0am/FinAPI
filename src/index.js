@@ -16,12 +16,26 @@ function verifyIfAccountExists(request, response, next){
     const customer = customers.find(c => c.cpf === cpf);
     
     if(!customer){
-        return response.status(400).json({error: 'Customer not found'})
+        return response.status(400).json({error: 'Customer not found'});
     }
 
     request.customer = customer;
     
     return next();
+}
+
+//função de obtenção do saldo de uma conta, no reduce o acc é o acumulador (ou seja, o total)
+// e o curr é o valor atual do array
+function getBalance(statement){
+    const balance = statement.reduce((acc, curr) => {
+        if(curr.type === 'credit'){
+            return acc + curr.value;
+        }else{
+            return acc - curr.value;
+        }
+    }, 0);
+
+    return balance;
 }
 
 
@@ -124,5 +138,38 @@ app.post('/deposit', verifyIfAccountExists, (request, response) => {
     return response.status(201).send();
 })
 
+// faz um saque na conta -> o cpf é o parametro de cabeçalho e se não existir
+// nenhuma conta que usa esse cpf, retorna um erro
+// além disso, o saldo da conta não pode ser menor que o valor do saque
+
+/**
+ * cpf - string (parametro do cabeçalho)
+ * 
+ * error -> se não existir conta com esse cpf (400)
+ *       -> se o saldo da conta for menor que o valor do saque (400)
+ * 
+ * 201 -> deu tudo certo e um novo statement será criado no array statement do usuário
+ */
+
+app.post('/withdraw', verifyIfAccountExists, (request, response) => {
+    const {amount} = request.body;
+    const customer = request.customer;
+
+    const balance = getBalance(customer.statement);
+
+    if(balance < amount){
+        return response.status(400).json({error: 'Insufficient funds.'});
+    }
+
+    const statementOperation = {
+        amount,
+        createdAt: new Date(),
+        type: 'debit'
+    };
+
+    customer.statement.push(statementOperation);
+
+    return response.status(201).send();
+})
 
 app.listen(3333);
